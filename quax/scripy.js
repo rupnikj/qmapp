@@ -18,12 +18,15 @@ var printHash = function (ht) {
     }
 }
 
-var tes = new strCount();
-tes.add('lla');
-tes.add('lla');
-tes.add('llaa');
-tes.add('lla');
-tes.add('llaa');
-tes.add('llaaa');
 
-printHash(tes.ht);
+
+
+//var tes = new strCount();
+//tes.add('lla');
+//tes.add('lla');
+//tes.add('llaa');
+//tes.add('lla');
+//tes.add('llaa');
+//tes.add('llaaa');
+
+//printHash(tes.ht);

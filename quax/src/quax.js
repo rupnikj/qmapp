@@ -8,6 +8,7 @@ var assert = require('assert.js');
 var time = require('time');
 var utilities = require('utilities.js');
 var snap = require('snap.js');
+var vis = require('visualization.js');
 
 var tw = qm.store("Tweets");
 if (tw.length == 0) {
@@ -19,7 +20,7 @@ if (tw.length == 0) {
     }
 }
 
-var rs = qm.search({ $from: "Tweets", Text: "sopa" });
+var rs = qm.search({ $from: "Tweets", Text: "occupy" });
 
 
 var regex = /(^|[^@\w])@(\w{1,15})\b/g;
@@ -152,7 +153,20 @@ var exejs = function (fnm) { var script = fs.openRead(fnm).readAll(); eval.call(
 var exejslocal = function (fnm) { var script = fs.openRead(fnm).readAll(); eval(script); }
 exejs('scripy.js');
 
+var dateCount = new strCount();
+rs.each(function (rec) { dateCount.add(rec.Date.dateString);})
+
+// create google annotated time line 
+
+var plotData = [];
+var ht = dateCount.ht;
+for (var i = 0; i < ht.length; i++) {
+    plotData.push([new Date(ht.key(i)), ht.dat(i)]);
+}
+vis.drawGoogleAnnotatedTimeLine(plotData, 'tesi.html');//, overrideParams
 eval(breakpoint)
+
+
 
 // hash table: dateString count
 
