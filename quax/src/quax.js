@@ -1,7 +1,3 @@
-// This example demonstrates text mining (feature vectors, active learning and classification)
-// as well as record set filtering (based on time and classification results). It also builds 
-// communication graphs based on sets of twitter messages (twitter specific)
-
 // Import libraries
 var analytics = require('analytics.js');
 var assert = require('assert.js');
@@ -20,151 +16,180 @@ if (tw.length == 0) {
     }
 }
 
-var rs = qm.search({ $from: "Tweets", Text: "occupy" });
-
-
-var regex = /(^|[^@\w])@(\w{1,15})\b/g;
-
-isRT = function (str) {
-    if (str.length > 3 && str[0] == 'r' && str[1] == 't' && str[2] == ' ') {
-        return true;
-    } else {
-        return false;
-    }
-}
-//rts = rs.map(function (rec) { return isRT(rec.Text); });
-//counter = 0; for (var i = 0; i < rts.length; i++) { if (rts[i]) counter++; }
-
-function descIdxMap(rs, getDescCallback) {
-    var map = utilities.newStrIntH();
-    var len = rs.length;
-    for (var i = 0; i < len; i++) {
-        var desc = getDescCallback(rs[i]);
-        if (!map.hasKey(desc)) {
-            map.put(desc, map.length);
-        }
-    }
-    return map;
+try {
+    exejs('graphs.js');
+} catch (e) {
+    console.log('error');
 }
 
-map = descIdxMap(rs, function (rec) { return '@' + rec.author.Username; })
-
-if (qm.store("Edges") == null) {
-    var gstore = {
-        name: "Edges",
-        fields: [
-          { name: "source", type: "int" },
-          { name: "target", type: "int" },
-        ]
-    }
-    qm.createStore(gstore);
-}
-var edges = qm.store("Edges");
-
-function addEdges(rs, map, descExtractor, linkExtractor, edgeStore) {
-    for (var i = 0; i < rs.length; i++) {
-        if (i % 1000 == 0) { console.log(i); }
-        var user = descExtractor(rs[i]);
-        var sourceN = map.get(user);
-        var arr = linkExtractor(rs[i]);
-        if (arr != null) {
-            for (var j = 0; j < arr.length; j++) {
-                var targetN = map.get(arr[j]);
-                if (typeof targetN != 'undefined') {
-                    edgeStore.add({ source: sourceN, target: targetN })
-                }
-            }
-        }
-    }
-}
-
-if (edges.length == 0) {
-    addEdges(rs, map,
-    function (rec) { return '@' + rec.author.Username; },
-    function (rec) { return rec.Text.match(regex); },
-    edges);
-}
-
-// remap indices
-var map2 = utilities.newIntIntH();
-if (qm.store("Remapped") == null) {
-    var gstore = {
-        name: "Remapped",
-        fields: [
-          { name: "source", type: "int" },
-          { name: "target", type: "int" },
-        ]
-    }
-    qm.createStore(gstore);
-}
-console.log("remapping")
-var edges2 = qm.store("Remapped");
-if (edges2.length == 0) {
-    for (var i = 0; i < edges.length; i++) {
-        var nid1 = edges[i].source;
-        var nid2 = edges[i].target;
-        if (!map2.hasKey(nid1)) {            
-            map2.put(nid1, map2.length);
-        }
-        if (!map2.hasKey(nid2)) {
-            map2.put(nid2, map2.length);
-        }
-        edges2.add({ source: map2.get(nid1), target: map2.get(nid2) });
-    }
-}
-
-function buildGraph2(edgeStore) {
-    var G = snap.newDGraph();
-    // add edges
-    for (var i = 0; i < edgeStore.length; i++) {
-        nid1 = edgeStore[i].source;
-        nid2 = edgeStore[i].target;
-        if (!G.isNode(nid1)) { G.addNode(nid1); }
-        if (!G.isNode(nid2)) { G.addNode(nid2); }
-        G.addEdge(nid1, nid2);
-    }
-    return G;
-}
-
-G2 = buildGraph2(edges2);
-//G2.dump('rick2.graph');
-
-
-function write_adjlist(G, fnm) {
-    var fout = fs.openWrite(fnm);
-    var node = G.firstNode;
-    while (node.id != -1) {
-        // get outgoing links
-        if (node.outDeg > 0) {
-            fout.write(node.id + " ");
-            for (var i = 0; i < node.outDeg ; i++) {
-                fout.write(node.nbrId(i) + " ");
-            }
-            fout.write("\n");
-        }
-        node.next();
-    }
-    fout.close();
-}
-
-write_adjlist(G2, 'rick.adjlist');
-
-var exejs = function (fnm) { var script = fs.openRead(fnm).readAll(); eval.call(global,script);}
-var exejslocal = function (fnm) { var script = fs.openRead(fnm).readAll(); eval(script); }
-exejs('scripy.js');
-
-var dateCount = new strCount();
-rs.each(function (rec) { dateCount.add(rec.Date.dateString);})
-
-// create google annotated time line 
-
-var plotData = [];
-var ht = dateCount.ht;
-for (var i = 0; i < ht.length; i++) {
-    plotData.push([new Date(ht.key(i)), ht.dat(i)]);
-}
-vis.drawGoogleAnnotatedTimeLine(plotData, 'tesi.html');//, overrideParams
 eval(breakpoint)
+
+
+
+
+
+
+//var rs = qm.search({ $from: "Tweets", Text: "occupy" });
+
+
+//var regex = /(^|[^@\w])@(\w{1,15})\b/g;
+
+//isRT = function (str) {
+//    if (str.length > 3 && str[0] == 'r' && str[1] == 't' && str[2] == ' ') {
+//        return true;
+//    } else {
+//        return false;
+//    }
+//}
+////rts = rs.map(function (rec) { return isRT(rec.Text); });
+////counter = 0; for (var i = 0; i < rts.length; i++) { if (rts[i]) counter++; }
+
+//function descIdxMap(rs, getDescCallback) {
+//    var map = utilities.newStrIntH();
+//    var len = rs.length;
+//    for (var i = 0; i < len; i++) {
+//        var desc = getDescCallback(rs[i]);
+//        if (!map.hasKey(desc)) {
+//            map.put(desc, map.length);
+//        }
+//    }
+//    return map;
+//}
+
+
+//map = descIdxMap(rs, function (rec) { return '@' + rec.author.Username; })
+
+
+
+//if (qm.store("Edges") == null) {
+//    var gstore = {
+//        name: "Edges",
+//        fields: [
+//          { name: "source", type: "int" },
+//          { name: "target", type: "int" },
+//        ]
+//    }
+//    qm.createStore(gstore);
+//}
+//var edges = qm.store("Edges");
+
+//function addEdges(rs, map, descExtractor, linkExtractor, edgeStore) {
+//    for (var i = 0; i < rs.length; i++) {
+//        if (i % 1000 == 0) { console.log(i); }
+//        var user = descExtractor(rs[i]);
+//        var sourceN = map.get(user);
+//        var arr = linkExtractor(rs[i]);
+//        if (arr != null) {
+//            for (var j = 0; j < arr.length; j++) {
+//                var targetN = map.get(arr[j]);
+//                if (typeof targetN != 'undefined') {
+//                    edgeStore.add({ source: sourceN, target: targetN })
+//                }
+//            }
+//        }
+//    }
+//}
+
+//if (edges.length == 0) {
+//    addEdges(rs, map,
+//    function (rec) { return '@' + rec.author.Username; },
+//    function (rec) { return rec.Text.match(regex); },
+//    edges);
+//}
+
+//// remap indices
+//var map2 = utilities.newIntIntH();
+//if (qm.store("Remapped") == null) {
+//    var gstore = {
+//        name: "Remapped",
+//        fields: [
+//          { name: "source", type: "int" },
+//          { name: "target", type: "int" },
+//        ]
+//    }
+//    qm.createStore(gstore);
+//}
+//console.log("remapping")
+//var edges2 = qm.store("Remapped");
+//if (edges2.length == 0) {
+//    for (var i = 0; i < edges.length; i++) {
+//        var nid1 = edges[i].source;
+//        var nid2 = edges[i].target;
+//        if (!map2.hasKey(nid1)) {            
+//            map2.put(nid1, map2.length);
+//        }
+//        if (!map2.hasKey(nid2)) {
+//            map2.put(nid2, map2.length);
+//        }
+//        edges2.add({ source: map2.get(nid1), target: map2.get(nid2) });
+//    }
+//}
+
+//function buildGraph2(edgeStore) {
+//    var G = snap.newDGraph();
+//    // add edges
+//    for (var i = 0; i < edgeStore.length; i++) {
+//        nid1 = edgeStore[i].source;
+//        nid2 = edgeStore[i].target;
+//        if (!G.isNode(nid1)) { G.addNode(nid1); }
+//        if (!G.isNode(nid2)) { G.addNode(nid2); }
+//        G.addEdge(nid1, nid2);
+//    }
+//    return G;
+//}
+
+//G2 = buildGraph2(edges2);
+////G2.dump('rick2.graph');
+
+
+//function write_adjlist(G, fnm) {
+//    var fout = fs.openWrite(fnm);
+//    var node = G.firstNode;
+//    while (node.id != -1) {
+//        // get outgoing links
+//        if (node.outDeg > 0) {
+//            fout.write(node.id + " ");
+//            for (var i = 0; i < node.outDeg ; i++) {
+//                fout.write(node.nbrId(i) + " ");
+//            }
+//            fout.write("\n");
+//        }
+//        node.next();
+//    }
+//    fout.close();
+//}
+
+//write_adjlist(G2, 'rick.adjlist');
+
+//exejs('scripy.js');
+
+//var dateCount = new strCount();
+//rs.each(function (rec) { dateCount.add(rec.Date.dateString);})
+
+//// create google annotated time line 
+
+//var plotData = [];
+//var ht = dateCount.ht;
+//for (var i = 0; i < ht.length; i++) {
+//    plotData.push([new Date(ht.key(i)), ht.dat(i)]);
+//}
+//vis.drawGoogleAnnotatedTimeLine(plotData, 'tesi.html');//, overrideParams
+
+//function fracToIdx(frac, len) {
+//    return Math.min(Math.floor(frac * len), len -1);
+//}
+
+//var cutFractions = la.newVec([0, 0.33, 0.66, 1.0]);
+//for (var i = 0; i < cutFractions.length - 1; i++) {
+//    var id1 = fracToIdx(cutFractions[i], rs.length);
+//    var id2 = fracToIdx(cutFractions[i + 1], rs.length);
+//    var frs = tw.newRecSet(la.rangeVec(id1, id2));
+
+
+//}
+
+
+//eval(breakpoint)
 
 
 
