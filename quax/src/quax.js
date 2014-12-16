@@ -15,7 +15,7 @@ if (tw.length == 0) {
         if (i % 24 == 0) console.log("processed " + i / 24 + " days");
     }
 }
-
+eval(breakpoint)
 var keyw = "occupy";
 var rs = qm.search({ $from: "Tweets", Text: keyw});
 

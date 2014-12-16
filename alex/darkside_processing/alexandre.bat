@@ -1,0 +1,1 @@
+x64\Release\twitter_filter -i:"u:/tweets" -o:"z:/processed/twitter/alexandre_output" -k:alexandre_filter.txt -cores:4
