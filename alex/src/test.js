@@ -24,7 +24,7 @@ function groupBy(array, f) {
     //})
 }
 
-strArr = fs.listFile('D:/work/data/amsterdam/quax_output/', 'rar', true);
+strArr = fs.listFile('Z:/processed/twitter/alexandre_output/', 'rar', true);
 
 var result = groupBy(strArr, function (item) {
     return item.substring(item.length - 24, item.length - 14);
@@ -35,31 +35,64 @@ var lines = fs.openRead('./darkside_processing/alexandre_filter.txt').readAll();
 var keywords = lines.split('\r\n');
 var searchVec = la.newStrVec(keywords);
 
-
-var tw = qm.store("Tweets");
+function textExtractor(vec, file) {
+    var fin = fs.openRead(file);
+    var count = 0;
+    while (!fin.eof) {
+        var line = fin.getNextLn();
+        if (line == "") { continue; }
+        try {
+            var rec = JSON.parse(line);
+            vec.push(rec.Text);
+            //store.add(rec);
+        } catch (e) {
+            printj(e);
+        }
+    }
+}
+var counts = [];
 var mats = [];
 for (var dayN = 0; dayN < result.grp.length; dayN++) {
     console.log(result.grp[dayN]);
-    tw.clear();
+    var dataVec = la.newStrVec({ vals: 0, mxvals: 1000000 });
     for (var rarN = 0; rarN < result.arr[dayN].length; rarN++) {
-        qm.load.jsonFile(tw, result.arr[dayN][rarN]);
+        textExtractor(dataVec, result.arr[dayN][rarN]);
     }
-    var rs = tw.recs;
-    var timestamps = rs.getVec("Date");
-    res = timestamps.sortPerm();
-    rs.permute(res.perm);
-
-    var dataVec = rs.getVec("Text");
+    console.log(dataVec.length);
     mats.push([misc.word_co(dataVec, searchVec)]);
-    if (dayN > 5) { break }
+    counts.push(dataVec.length);
+    //if (dayN == 2) { break;}
 }
 catmats = la.cat(mats);
 
-// row names and colnames print!
-var colNames = searchVec;
-var rowNames = la.newStrVec(result.grp);
-
-eval(breakpoint);
+var saveGrpData = function (fnm) {
+    var fout = fs.openWrite(fnm);
+    for (var dayN = 0; dayN < result.grp.length; dayN++) {
+        fout.writeLine(result.grp[dayN] + " " + counts[dayN])
+    }
+    fout.close();
+};
+var saveCols = function (fnm) {
+    var fout = fs.openWrite(fnm);
+    for (var i = 0; i < searchVec.length; i++) {
+        fout.writeLine(searchVec[i]);
+    }
+    fout.close();
+};
+var matSaveAsci = function (matrix,fnm) {
+    var fout = fs.openWrite(fnm);
+    for (var rowN = 0; rowN < matrix.rows; rowN++) {
+        for (var colN = 0; colN < matrix.cols; colN++) {
+            fout.write(matrix.at(rowN, colN).toFixed(0) + " ");
+        }
+        fout.writeLine();
+    }
+    fout.close();
+};
+saveGrpData('info.txt');
+saveCols('cols.txt');
+matSaveAsci(catmats, 'matrix.txt');
+//eval(breakpoint);
 
 
 

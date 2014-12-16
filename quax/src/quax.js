@@ -16,17 +16,49 @@ if (tw.length == 0) {
     }
 }
 eval(breakpoint)
-try {
-    exejs('graphs.js');
-} catch (e) {
-    console.log('error');
+var keyw = "occupy";
+var rs = qm.search({ $from: "Tweets", Text: keyw});
+
+eval(breakpoint);
+var dateCount = utilities.newStrIntH();
+rs.each(function (rec) { 
+	var str = rec.Date.dateString;
+	var cnt = dateCount.get(str);
+	if (cnt == null) {
+	   dateCount.put(str, 1);
+	} else {
+		dateCount.put(str, cnt + 1);
+	}
+});
+eval(breakpoint);
+//// create google annotated time line 
+
+var plotData = [];
+var ht = dateCount;
+for (var i = 0; i < ht.length; i++) {
+    plotData.push([new Date(ht.key(i)), ht.dat(i)]);
 }
+vis.drawGoogleAnnotatedTimeLine(plotData, 'tesi.html');//, overrideParams
+
+eval(breakpoint)
+
+try {exejs('graphs.js'); } catch (e) {console.log('error');}
 
 eval(breakpoint)
 
 
+//var a = 0;
+
+//ftrSpace = qm.analytics.newFeatureSpace([ { type: 'jsfunc', source: { store: 'Movies' }, 
+//    name : 'titleAndPlotCharCount', dim : 2, 
+//    fun: function (rec) {
+//        a = a + 1;
+//        return la.newVec([rec.Title.length, rec.Plot.length]);
+//    }
+//}])
 
 
+//ftrSpace.getTr
 
 
 //var rs = qm.search({ $from: "Tweets", Text: "occupy" });
