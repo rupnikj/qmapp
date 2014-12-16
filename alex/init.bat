@@ -12,4 +12,4 @@ set PATH=%PATH%;%QMINER_HOME%
 
 
 del /q lock
-qm create -def=twitter.def
+qm create -def=twitter_alex.def
