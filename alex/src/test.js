@@ -24,7 +24,7 @@ function groupBy(array, f) {
     //})
 }
 
-strArr = fs.listFile('Z:/processed/twitter/alexandre_output/', 'rar', true);
+strArr = fs.listFile(fs.openRead('datapath.txt').readAll(), 'rar', true);
 
 var result = groupBy(strArr, function (item) {
     return item.substring(item.length - 24, item.length - 14);
