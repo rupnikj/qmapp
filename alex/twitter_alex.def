@@ -1,0 +1,8 @@
+[
+  { 
+    "name": "Tweets", 
+    "fields": [ 
+      { "name": "Text", "type": "string"}
+    ] 
+  } 
+]
