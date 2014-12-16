@@ -1,5 +1,5 @@
 @echo off
-set REL_PATH=..\..\build
+set REL_PATH=..\..\qminer\build
 set QMINER_HOME=
 rem // save current directory and change to target directory
 pushd %REL_PATH%
