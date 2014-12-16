@@ -51,9 +51,13 @@ for (var dayN = 0; dayN < result.grp.length; dayN++) {
 
     var dataVec = rs.getVec("Text");
     mats.push([misc.word_co(dataVec, searchVec)]);
-
+    if (dayN > 5) { break }
 }
 catmats = la.cat(mats);
+
+// row names and colnames print!
+var colNames = searchVec;
+var rowNames = la.newStrVec(result.grp);
 
 eval(breakpoint);
 
