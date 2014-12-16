@@ -15,7 +15,7 @@ if (tw.length == 0) {
         if (i % 24 == 0) console.log("processed " + i / 24 + " days");
     }
 }
-
+eval(breakpoint)
 try {
     exejs('graphs.js');
 } catch (e) {
